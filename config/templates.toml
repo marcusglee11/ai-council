@@ -1,0 +1,9 @@
+# config/templates.toml
+
+[programming]
+code_review = "Please act as a senior software engineer and provide a thorough code review for the following snippet. Focus on correctness, clarity, and potential performance issues. Here is the code:\n\n```\n{code_snippet}\n```"
+architecture_design = "Given these requirements: {requirements}, design a high-level system architecture. Describe the key components, data flow, and technology stack choices."
+
+[philosophy]
+thought_experiment = "Explore the philosophical implications of the following thought experiment: {experiment_description}. Consider perspectives from utilitarianism, deontology, and virtue ethics."
+meaning_of_life = "Discuss the concept of 'the meaning of life'. What are some historical and modern perspectives on how one might find or create meaning?"

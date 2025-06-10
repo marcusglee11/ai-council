@@ -1,3 +1,5 @@
+# .gitignore
+
 # Python virtual environment
 venv/
 .venv/
@@ -10,8 +12,10 @@ __pycache__/
 .vscode/
 .idea/
 
-# Temporary session state file
+# Session and log files - NEVER COMMIT THESE
 session_state.json
+logs/
+output/
 
-# Environment file for secrets - NEVER COMMIT THIS
+# Environment file for secrets
 .env

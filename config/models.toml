@@ -1,0 +1,13 @@
+# config/models.toml (v4.3 - High-Speed Council)
+
+# Llama 3.3 70B is fast and powerful, making it a great Rapporteur.
+[rapporteur]
+model = "meta-llama/llama-3.3-70b-instruct"
+
+# This council is optimized for near-instantaneous response times.
+# We've replaced the slow models with proven, fast alternatives.
+[models]
+"Llama 3.3 70B (Heavyweight)" = "meta-llama/llama-3.3-70b-instruct"
+"Mistral Nemo (Main Rival)" = "mistralai/mistral-nemo"
+"Nous Hermes 2 Mixtral (Fast Specialist)" = "nousresearch/nous-hermes-2-mixtral-8x7b-dpo"
+"Mistral 7B Instruct (Reliable Generalist)" = "mistralai/mistral-7b-instruct"
