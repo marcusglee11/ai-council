@@ -5,6 +5,7 @@ from openai import AsyncOpenAI
 # NEW: Import the Status spinner from rich
 from rich.status import Status
 from . import ui, utils
+from .utils import logger
 from .session import SessionState
 
 async def ask_advisor(client: AsyncOpenAI, model_name: str, friendly_name: str, messages: list):
@@ -54,7 +55,7 @@ async def run_turn(client: AsyncOpenAI, state: SessionState, prompts: dict, coun
 
     # 4. Call the Rapporteur for synthesis
     if not current_responses:
-        print("\n[!] No successful responses from the council. Skipping Rapporteur.")
+        logger.warning("No successful responses from the council. Skipping Rapporteur")
         state.last_rapporteur_report = "> [!ERROR]\n> No successful responses were received from the council for this turn."
     else:
         payload_json = json.dumps({"user_feedback": state.last_user_input, "council_responses": current_responses}, indent=2)
