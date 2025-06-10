@@ -1,6 +1,7 @@
 # ai_council/session.py
 import os
 import json
+from .utils import logger
 
 SESSION_FILE = "session_state.json"
 
@@ -12,12 +13,12 @@ def load_or_initialize_session() -> dict:
     if os.path.exists(SESSION_FILE):
         resume = input("A previous session was found. Resume it? (y/n): ").lower()
         if resume == 'y':
-            print("... Resuming previous session ...")
+            logger.info("Resuming previous session")
             try:
                 with open(SESSION_FILE, 'r', encoding='utf-8') as f:
                     return json.load(f)
             except (json.JSONDecodeError, FileNotFoundError):
-                print("Error reading session file. Starting a new session.")
+                logger.error("Error reading session file. Starting a new session", exc_info=True)
                 os.remove(SESSION_FILE)
         else:
             # User chose not to resume, so clean up and start fresh.
@@ -45,7 +46,7 @@ def save_session_state(state: dict):
 
 def end_session(state: dict):
     """Writes the final Markdown report and cleans up the session file."""
-    print("\nSession ended.")
+    logger.info("Session ended")
     if state['session_log']:
         output_dir = "output"
         os.makedirs(output_dir, exist_ok=True)
@@ -67,7 +68,7 @@ def end_session(state: dict):
                 f.write(f"{turn.get('rapporteur_report', 'No report generated.')}\n\n")
         # --- END FIX ---
         
-        print(f"\n[+] Obsidian-friendly session report exported to {full_path}")
+        logger.info("Obsidian-friendly session report exported to %s", full_path)
 
     if os.path.exists(SESSION_FILE):
         os.remove(SESSION_FILE)
