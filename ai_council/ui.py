@@ -173,3 +173,4 @@ def display_rapporteur_report(report: str):
 def display_turn_telemetry(turn_cost: float, total_cost: float, turn: int):
     """Prints the cost information for the completed turn."""
     logger.info("Turn %s Cost: $%0.6f | Total Session Cost: $%0.6f", turn, turn_cost, total_cost)
+
