@@ -45,3 +45,6 @@ Simply run the main script from the root directory of the project:
 
 ```bash
 python main.py
+```
+
+You will be prompted for a question. Once the council has deliberated, a Markdown report will be saved in the output/ directory.
