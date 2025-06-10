@@ -45,3 +45,4 @@ Simply run the main script from the root directory of the project:
 
 ```bash
 python main.py
+```
