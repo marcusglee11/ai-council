@@ -26,7 +26,7 @@ A Python tool for consulting a "council" of different Large Language Models (LLM
 
 3.  **Set API Key**
     You must have an [OpenRouter.ai](https://openrouter.ai/) account and API key. Set it as an environment variable.
-    
+
     *On Windows:*
     ```cmd
     set OPENROUTER_API_KEY="your-key-here"
@@ -45,3 +45,5 @@ Simply run the main script from the root directory of the project:
 
 ```bash
 python main.py
+```
+
