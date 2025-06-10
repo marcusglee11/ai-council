@@ -85,28 +85,26 @@ def get_initial_prompt(templates: dict) -> str:
                 if 0 < template_choice <= len(template_items):
                     _, template_string = template_items[template_choice-1]
                     
-                    # --- NEW: Context-Aware Placeholder Filling ---
                     placeholders = re.findall(r'\{(.*?)\}', template_string)
                     filled_values = {}
-                    
+
                     console.print("\n--- Fill in the template placeholders ---", style="bold yellow")
                     for placeholder in placeholders:
                         # Create a version of the template with the current placeholder highlighted
                         highlighted_template = template_string.replace(
                             f"{{{placeholder}}}",
-                            f"**`{{{placeholder}}}`**" # Use Markdown bold/code for highlight
+                            f"**`{{{placeholder}}}`**"  # Use Markdown bold/code for highlight
                         )
-                        
+
                         console.print(f"\nTemplate Context for '[bold magenta]{placeholder}[/bold magenta]':")
                         # Display the full template with the highlight inside a quote block
                         console.print(Markdown(f"> {highlighted_template}"))
-                        
+
                         # Ask for the input for this specific placeholder
                         value = input(f"  Enter value for [bold magenta]{placeholder}[/bold magenta]: ")
                         filled_values[placeholder] = value
 
                     return template_string.format(**filled_values)
-                    # --- END NEW ---
                 else:
                     console.print("Invalid template selection.", style="red")
             else:
@@ -118,8 +116,10 @@ def get_follow_up_input(turn_counter: int) -> str:
     """Collect follow-up feedback from the user."""
     console.print(f"\n" + "="*20 + f" Turn {turn_counter} " + "="*20, style="bold blue")
     
-    # NEW: Inform the user about the new command.
-    console.print("Enter your follow-up feedback, or type [bold green]'go'[/bold green] to use the Facilitator's suggested question.", justify="left")
+    console.print(
+        "Enter your follow-up feedback, or type [bold green]'go'[/bold green] to use the Facilitator's suggested question.",
+        justify="left",
+    )
     user_input = input("Type 'quit' to exit > ")
     return user_input
 

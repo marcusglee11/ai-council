@@ -51,8 +51,6 @@ def end_session(state: dict) -> None:
         filename = state.get('output_filename', 'council_report.md')
         full_path = os.path.join(output_dir, filename)
         
-        # --- FIX IS HERE ---
-        # The following lines are now correctly indented inside the 'with' block.
         with open(full_path, 'w', encoding='utf-8') as f:
             f.write("# 🏛️ AI Council Session Report\n\n")
             f.write("This document contains the complete transcript of the AI Council session.\n\n")
@@ -63,7 +61,6 @@ def end_session(state: dict) -> None:
                 f.write(f"> [!QUESTION] User Input for Turn {turn['turn']}\n> {user_prompt}\n\n")
                 f.write("### 🧠 Rapporteur's Synthesis\n\n")
                 f.write(f"{turn.get('rapporteur_report', 'No report generated.')}\n\n")
-        # --- END FIX ---
         
         print(f"\n[+] Obsidian-friendly session report exported to {full_path}")
 

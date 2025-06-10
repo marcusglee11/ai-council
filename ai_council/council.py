@@ -117,10 +117,8 @@ async def run_turn(
         )
         messages = [{"role": "system", "content": prompts['rapporteur_system_prompt']}, {"role": "user", "content": rapporteur_user_prompt}]
         
-        # --- NEW: ADDED STATUS SPINNER ---
         with Status("[bold green]Rapporteur is compiling the report...", spinner="earth", console=ui.console):
             rapporteur_result = await ask_advisor(client, rapporteur_model, "Rapporteur", messages)
-        # --- END NEW ---
 
         state['last_rapporteur_report'] = rapporteur_result.get('response', 'Rapporteur failed to generate a report.')
         state['total_session_cost'] += rapporteur_result.get('cost', 0)
