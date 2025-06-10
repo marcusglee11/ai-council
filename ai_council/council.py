@@ -1,21 +1,80 @@
-# ai_council/council.py
+"""Core orchestration utilities for running an AI council turn.
+
+This module dispatches prompts to multiple advisor models, collates their
+responses and then asks a rapporteur model to synthesise a report.
+"""
+
 import asyncio
 import json
 from openai import AsyncOpenAI
-# NEW: Import the Status spinner from rich
-from rich.status import Status
+from rich.status import Status  # spinner for rapporteur progress
+
 from . import ui, utils
 
-async def ask_advisor(client: AsyncOpenAI, model_name: str, friendly_name: str, messages: list):
-    # This function is correct and remains unchanged.
+async def ask_advisor(
+    client: AsyncOpenAI,
+    model_name: str,
+    friendly_name: str,
+    messages: list,
+) -> dict:
+    """Query a single advisor model and return its raw response.
+
+    Parameters
+    ----------
+    client : AsyncOpenAI
+        OpenAI client used to issue the request.
+    model_name : str
+        Identifier of the model to query.
+    friendly_name : str
+        Human readable advisor name.
+    messages : list
+        Chat history to send to the model.
+
+    Returns
+    -------
+    dict
+        Dictionary containing the advisor name, response text and request cost.
+        If an error occurs, ``error`` will be set to ``True``.
+    """
+
     try:
-        response = await client.chat.completions.with_raw_response.create(model=model_name, messages=messages)
+        response = await client.chat.completions.with_raw_response.create(
+            model=model_name,
+            messages=messages,
+        )
         chat_completion = response.parse()
-        return {"advisor": friendly_name, "response": chat_completion.choices[0].message.content, "cost": float(response.headers.get("x-openrouter-cost", 0))}
-    except Exception as e:
+        return {
+            "advisor": friendly_name,
+            "response": chat_completion.choices[0].message.content,
+            "cost": float(response.headers.get("x-openrouter-cost", 0)),
+        }
+    except Exception as e:  # pragma: no cover - network failure
         return {"advisor": friendly_name, "response": e, "cost": 0, "error": True}
 
-async def run_turn(client: AsyncOpenAI, state: dict, prompts: dict, council_prompt: str) -> dict:
+async def run_turn(
+    client: AsyncOpenAI,
+    state: dict,
+    prompts: dict,
+    council_prompt: str,
+) -> dict:
+    """Execute a single council turn and update ``state``.
+
+    Parameters
+    ----------
+    client : AsyncOpenAI
+        API client for advisor and rapporteur calls.
+    state : dict
+        Mutable session state dictionary.
+    prompts : dict
+        Configuration prompts used for the rapporteur.
+    council_prompt : str
+        Prompt to send to each advisor.
+
+    Returns
+    -------
+    dict
+        The updated session ``state``.
+    """
     histories = state['council_histories']
     models = state['selected_models']
     rapporteur_model = state['rapporteur_model_id']
@@ -68,5 +127,5 @@ async def run_turn(client: AsyncOpenAI, state: dict, prompts: dict, council_prom
     
     # 5. Display the final report for the turn
     ui.display_rapporteur_report(state['last_rapporteur_report'])
-    
+
     return state

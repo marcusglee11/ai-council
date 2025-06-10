@@ -1,14 +1,12 @@
-# ai_council/session.py
+"""Utilities for persisting and finalising AI council sessions."""
+
 import os
 import json
 
 SESSION_FILE = "session_state.json"
 
 def load_or_initialize_session() -> dict:
-    """
-    Checks for a session file. If found and user confirms, loads the state.
-    Otherwise, returns a blank state template for a new session.
-    """
+    """Load a saved session or create a new blank state."""
     if os.path.exists(SESSION_FILE):
         resume = input("A previous session was found. Resume it? (y/n): ").lower()
         if resume == 'y':
@@ -38,13 +36,13 @@ def load_or_initialize_session() -> dict:
         "last_user_input": ""
     }
 
-def save_session_state(state: dict):
-    """Saves the entire current session state to the JSON file."""
+def save_session_state(state: dict) -> None:
+    """Persist the current ``state`` to ``SESSION_FILE``."""
     with open(SESSION_FILE, 'w', encoding='utf-8') as f:
         json.dump(state, f, indent=2)
 
-def end_session(state: dict):
-    """Writes the final Markdown report and cleans up the session file."""
+def end_session(state: dict) -> None:
+    """Write the markdown report and remove any session file."""
     print("\nSession ended.")
     if state['session_log']:
         output_dir = "output"

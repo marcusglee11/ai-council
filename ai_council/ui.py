@@ -1,6 +1,10 @@
-# ai_council/ui.py
+"""Interactive console utilities for the AI council application."""
 
-import os, re, time, asyncio, fitz
+import os
+import re
+import time
+import asyncio
+import fitz
 from rich.live import Live
 from rich.table import Table
 from rich.spinner import Spinner
@@ -9,13 +13,14 @@ from rich.markdown import Markdown
 
 console = Console()
 
-def display_welcome():
-    console.print("="*50, style="bold blue")
+def display_welcome() -> None:
+    """Print the opening banner."""
+    console.print("=" * 50, style="bold blue")
     console.print("Welcome to the AI Council (v5.2 - Context-Aware UI)", style="bold blue")
-    console.print("="*50, style="bold blue")
+    console.print("=" * 50, style="bold blue")
 
 def select_models(available_models: dict) -> dict:
-    # This function is correct and remains the same.
+    """Prompt the user to choose which advisor models to use."""
     console.print("\n--- Select Your Advisors ---", style="bold yellow")
     model_items = list(available_models.items())
     for i, (name, _) in enumerate(model_items, 1):
@@ -31,7 +36,7 @@ def select_models(available_models: dict) -> dict:
         except ValueError: console.print("Invalid input.", style="red")
 
 def get_document_context() -> str:
-    # This function is correct and remains the same.
+    """Load optional context from a user provided document."""
     while True:
         add_doc = input("Add a file for context (txt, md, pdf)? (y/n): ").lower()
         if add_doc == 'n': return ""
@@ -56,7 +61,7 @@ def get_document_context() -> str:
         else: console.print("Invalid input.", style="red")
 
 def get_initial_prompt(templates: dict) -> str:
-    """Handles the entire prompt-gathering flow for the first turn with contextual highlighting."""
+    """Handle prompt gathering for the first turn using templates."""
     console.print("\n--- Select a Prompt Template ---", style="bold yellow")
     categories = list(templates.keys())
     for i, category in enumerate(categories): print(f"  [{i+1}] {category.replace('_', ' ').title()}")
@@ -110,7 +115,7 @@ def get_initial_prompt(templates: dict) -> str:
             console.print("Invalid input. Please try again.", style="red")
 
 def get_follow_up_input(turn_counter: int) -> str:
-    """Gets follow-up feedback, informing the user about the 'go' command."""
+    """Collect follow-up feedback from the user."""
     console.print(f"\n" + "="*20 + f" Turn {turn_counter} " + "="*20, style="bold blue")
     
     # NEW: Inform the user about the new command.
@@ -119,7 +124,7 @@ def get_follow_up_input(turn_counter: int) -> str:
     return user_input
 
 def generate_status_table(statuses: dict) -> Table:
-    """Creates the rich Table for the live progress dashboard."""
+    """Create the rich ``Table`` for the live progress dashboard."""
     table = Table(title="AI Council Status", expand=True, border_style="blue")
     table.add_column("Advisor", style="cyan", no_wrap=True)
     table.add_column("Status")
@@ -136,8 +141,8 @@ def generate_status_table(statuses: dict) -> Table:
         table.add_row(name, status_display, time_str)
     return table
 
-async def live_council_progress(tasks: list) -> list:
-    """Manages the live display of the council's progress using rich.Live."""
+async def live_council_progress(tasks: list[asyncio.Task]) -> list:
+    """Display progress for advisor tasks and return their results."""
     model_statuses = {task.get_name(): {"status": "Querying...", "time": 0} for task in tasks}
     start_time = time.time()
     results = []
@@ -157,13 +162,13 @@ async def live_council_progress(tasks: list) -> list:
     console.print("\n...Council deliberation complete...", style="bold green")
     return results
 
-def display_rapporteur_report(report: str):
-    """Renders the Rapporteur's Markdown report to the terminal."""
+def display_rapporteur_report(report: str) -> None:
+    """Render the Rapporteur's Markdown report to the terminal."""
     console.print("\n" + "="*50, style="bold blue")
     console.print("           COUNCIL FACILITATOR'S REPORT", style="bold blue")
     console.print("="*50, style="bold blue")
     console.print(Markdown(report))
 
-def display_turn_telemetry(turn_cost: float, total_cost: float, turn: int):
-    """Prints the cost information for the completed turn."""
+def display_turn_telemetry(turn_cost: float, total_cost: float, turn: int) -> None:
+    """Print cost information for the completed turn."""
     console.print(f"\n--- Turn {turn} Cost: ${turn_cost:.6f} | Total Session Cost: ${total_cost:.6f} ---", style="yellow")
