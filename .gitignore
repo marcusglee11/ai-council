@@ -1,0 +1,17 @@
+# Python virtual environment
+venv/
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# IDE and editor folders
+.vscode/
+.idea/
+
+# Temporary session state file
+session_state.json
+
+# Environment file for secrets - NEVER COMMIT THIS
+.env
