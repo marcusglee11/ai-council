@@ -6,6 +6,7 @@ from rich.table import Table
 from rich.spinner import Spinner
 from rich.console import Console
 from rich.markdown import Markdown
+from .utils import logger
 
 console = Console()
 
@@ -27,8 +28,10 @@ def select_models(available_models: dict) -> dict:
             indices = [int(x.strip()) - 1 for x in selection.split(",")]
             if all(0 <= i < len(model_items) for i in indices):
                 return {model_items[i][0]: model_items[i][1] for i in indices}
-            else: console.print("Invalid number detected.", style="red")
-        except ValueError: console.print("Invalid input.", style="red")
+            else:
+                logger.error("Invalid number detected")
+        except ValueError:
+            logger.error("Invalid input")
 
 def get_document_context() -> str:
     # This function is correct and remains the same.
@@ -39,7 +42,7 @@ def get_document_context() -> str:
             raw_path = input("Please provide the full path to the file: ")
             file_path = raw_path.strip().strip('"').strip("'")
             if not os.path.exists(file_path):
-                console.print(f"❌ ERROR: File not found at '{file_path}'. Please try again.", style="red")
+                logger.error("File not found at '%s'", file_path)
                 continue
             try:
                 content = ""
@@ -48,12 +51,15 @@ def get_document_context() -> str:
                 elif file_path.lower().endswith(('.txt', '.md')):
                     with open(file_path, 'r', encoding='utf-8') as f: content = f.read()
                 else:
-                    console.print("❌ ERROR: Unsupported file type.", style="red"); continue
+                    logger.error("Unsupported file type")
+                    continue
                 
-                console.print(f"✅ Loaded {len(content):,} characters from {os.path.basename(file_path)}.", style="green")
+                logger.info("Loaded %d characters from %s", len(content), os.path.basename(file_path))
                 return f"--- DOCUMENT CONTEXT ---\n{content}\n--- END DOCUMENT CONTEXT ---\n\n"
-            except Exception as e: console.print(f"❌ ERROR: Could not read file: {e}", style="red")
-        else: console.print("Invalid input.", style="red")
+            except Exception as e:
+                logger.error("Could not read file: %s", e, exc_info=True)
+        else:
+            logger.error("Invalid input")
 
 def get_initial_prompt(templates: dict) -> str:
     """Handles the entire prompt-gathering flow for the first turn with contextual highlighting."""
@@ -103,11 +109,11 @@ def get_initial_prompt(templates: dict) -> str:
                     return template_string.format(**filled_values)
                     # --- END NEW ---
                 else:
-                    console.print("Invalid template selection.", style="red")
+                    logger.error("Invalid template selection")
             else:
-                console.print("Invalid category selection.", style="red")
+                logger.error("Invalid category selection")
         except (ValueError, IndexError):
-            console.print("Invalid input. Please try again.", style="red")
+            logger.error("Invalid input. Please try again")
 
 def get_follow_up_input(turn_counter: int) -> str:
     """Gets follow-up feedback, informing the user about the 'go' command."""
@@ -154,7 +160,7 @@ async def live_council_progress(tasks: list) -> list:
             model_statuses[advisor_name]['time'] = elapsed
             results.append(result)
             live.update(generate_status_table(model_statuses))
-    console.print("\n...Council deliberation complete...", style="bold green")
+    logger.info("Council deliberation complete")
     return results
 
 def display_rapporteur_report(report: str):
@@ -166,4 +172,4 @@ def display_rapporteur_report(report: str):
 
 def display_turn_telemetry(turn_cost: float, total_cost: float, turn: int):
     """Prints the cost information for the completed turn."""
-    console.print(f"\n--- Turn {turn} Cost: ${turn_cost:.6f} | Total Session Cost: ${total_cost:.6f} ---", style="yellow")
+    logger.info("Turn %s Cost: $%0.6f | Total Session Cost: $%0.6f", turn, turn_cost, total_cost)

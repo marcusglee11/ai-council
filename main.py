@@ -5,6 +5,7 @@ import datetime
 import re  # NEW: Import regular expressions
 from openai import AsyncOpenAI
 from ai_council import council, session, utils, ui
+from ai_council.utils import logger
 
 def extract_suggested_question(report: str) -> str | None:
     """Uses regex to find the question within the 'QUESTION' callout block."""
@@ -45,7 +46,7 @@ async def main():
             slug = await utils.generate_filename_slug(state['last_user_input'], client, state['selected_models'], prompts_config['filename_slug_prompt'])
             date_str = datetime.datetime.now().strftime('%Y%m%d')
             state['output_filename'] = f"{date_str}_{slug}.md"
-            print(f"-> Session will be saved to: output/{state['output_filename']}")
+            logger.info("Session will be saved to: output/%s", state['output_filename'])
         else:
             user_input = ui.get_follow_up_input(state['turn_counter'])
             
@@ -53,10 +54,10 @@ async def main():
             if user_input.lower() == 'go':
                 suggested_question = extract_suggested_question(state['last_rapporteur_report'])
                 if suggested_question:
-                    ui.console.print(f"\n[bold green]Using suggested question:[/bold green] '{suggested_question}'")
+                    logger.info("Using suggested question: '%s'", suggested_question)
                     user_input = suggested_question
                 else:
-                    ui.console.print("[bold red]Could not find a suggested question. Please enter your feedback manually.[/bold red]")
+                    logger.error("Could not find a suggested question. Please enter your feedback manually")
                     user_input = ui.get_follow_up_input(state['turn_counter']) # Re-prompt
             # --- END NEW ---
 
