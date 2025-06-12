@@ -1,5 +1,10 @@
 # ai_council/utils.py
-import os, tomllib, re, json, logging
+import os, re, json, logging
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - built-in always present on 3.11+
+    import tomli as tomllib
 from openai import AsyncOpenAI
 
 logger = logging.getLogger("ai_council")

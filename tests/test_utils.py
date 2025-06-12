@@ -3,6 +3,8 @@ import json
 import asyncio
 import sys
 import pathlib
+import importlib
+import builtins
 import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
@@ -36,6 +38,25 @@ def test_load_config_missing(tmp_path):
     missing = tmp_path / "missing.toml"
     with pytest.raises(FileNotFoundError):
         load_config(str(missing))
+
+
+def test_load_config_fallback(tmp_path, monkeypatch):
+    """Ensure fallback to tomli when tomllib is unavailable."""
+    file = tmp_path / "config.toml"
+    file.write_text("[section]\nkey='value'\n", encoding="utf-8")
+
+    original_import = builtins.__import__
+
+    def fake_import(name, *args, **kwargs):
+        if name == "tomllib":
+            raise ModuleNotFoundError
+        return original_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", fake_import)
+    import ai_council.utils as utils
+    utils = importlib.reload(utils)
+    cfg = utils.load_config(str(file))
+    assert cfg["section"]["key"] == "value"
 
 
 def test_generate_filename_slug():
