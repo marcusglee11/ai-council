@@ -42,7 +42,19 @@ def load_or_initialize_session() -> dict:
 def save_session_state(state: dict):
     """Saves the entire current session state to the JSON file."""
     with open(SESSION_FILE, 'w', encoding='utf-8') as f:
-        json.dump(state, f, indent=2)
+        json.dump(state, f, indent=2, ensure_ascii=False)
+
+
+def _format_turn_markdown(turn: dict) -> str:
+    """Formats a single turn from the session log as Markdown."""
+    user_prompt = turn.get('user_prompt', '').replace('\n', '\n> ')
+    return (
+        f"***\n\n"
+        f"## 🔄 Turn {turn['turn']}\n\n"
+        f"> [!QUESTION] User Input for Turn {turn['turn']}\n> {user_prompt}\n\n"
+        f"### 🧠 Rapporteur's Synthesis\n\n"
+        f"{turn.get('rapporteur_report', 'No report generated.')}\n\n"
+    )
 
 def end_session(state: dict):
     """Writes the final Markdown report and cleans up the session file."""
@@ -54,20 +66,12 @@ def end_session(state: dict):
         filename = state.get('output_filename', 'council_report.md')
         full_path = os.path.join(output_dir, filename)
         
-        # --- FIX IS HERE ---
-        # The following lines are now correctly indented inside the 'with' block.
         with open(full_path, 'w', encoding='utf-8') as f:
             f.write("# 🏛️ AI Council Session Report\n\n")
             f.write("This document contains the complete transcript of the AI Council session.\n\n")
             for turn in state['session_log']:
-                f.write(f"***\n\n## 🔄 Turn {turn['turn']}\n\n")
-                # Ensure user_prompt exists before replacing
-                user_prompt = turn.get('user_prompt', '').replace('\n', '\n> ')
-                f.write(f"> [!QUESTION] User Input for Turn {turn['turn']}\n> {user_prompt}\n\n")
-                f.write("### 🧠 Rapporteur's Synthesis\n\n")
-                f.write(f"{turn.get('rapporteur_report', 'No report generated.')}\n\n")
-        # --- END FIX ---
-        
+                f.write(_format_turn_markdown(turn))
+
         logger.info("Obsidian-friendly session report exported to %s", full_path)
 
     if os.path.exists(SESSION_FILE):

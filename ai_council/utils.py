@@ -43,5 +43,5 @@ def write_audit_log(turn_number: int, data: dict):
     os.makedirs(log_dir, exist_ok=True)
     filename = os.path.join(log_dir, f"turn_{turn_number:03d}_log.json")
     with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2)
+        json.dump(data, f, indent=2, ensure_ascii=False)
     logger.info("Audit log saved to %s", filename)
