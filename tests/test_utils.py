@@ -8,6 +8,7 @@ import pytest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 
 from ai_council.utils import load_config, generate_filename_slug, write_audit_log
+from main import extract_suggested_question
 
 
 class DummyClient:
@@ -62,3 +63,19 @@ def test_write_audit_log(tmp_path, monkeypatch):
     with open(p, "r", encoding="utf-8") as f:
         data = json.load(f)
     assert data == {"a": 1}
+
+
+def test_extract_suggested_question():
+    report = """\
+### 3. Synthesis & Proposed Path Forward
+> [!QUESTION]
+> Should we increase marketing spend?
+
+### 4. Suggested Follow-Up Question for the Council
+> [!QUESTION]
+> **What metrics** should we track to measure success?
+"""
+    assert (
+        extract_suggested_question(report)
+        == "What metrics should we track to measure success?"
+    )

@@ -8,14 +8,20 @@ from ai_council import council, session, utils, ui
 from ai_council.utils import logger
 
 def extract_suggested_question(report: str) -> str | None:
-    """Uses regex to find the question within the 'QUESTION' callout block."""
-    # This pattern looks for the text between the callout title and the end of the line
-    match = re.search(r'>\s*\[!QUESTION\]\s*.*\n>\s*(.*)', report, re.MULTILINE)
+    """Extracts the follow-up question from the report.
+
+    Anchors on the 'Suggested Follow-Up Question' heading and returns the first
+    `[!QUESTION]` block that follows.
+    """
+
+    pattern = (
+        r"(?s)^###.*Suggested Follow-Up Question.*?"  # Heading
+        r"^>\s*\[!QUESTION\].*?\n"                   # Start of callout
+        r">\s*(.+?)\s*$"                             # Question line
+    )
+    match = re.search(pattern, report, re.MULTILINE)
     if match:
-        # Clean up the extracted question
-        question = match.group(1).strip()
-        # Remove markdown bolding if present
-        question = question.replace('**', '')
+        question = match.group(1).strip().replace("**", "")
         return question
     return None
 
