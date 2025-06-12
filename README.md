@@ -48,3 +48,7 @@ python main.py
 ```
 
 You will be prompted for a question. Once the council has deliberated, a Markdown report will be saved in the output/ directory.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
