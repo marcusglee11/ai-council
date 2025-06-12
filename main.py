@@ -73,7 +73,8 @@ async def main():
         state = await council.run_turn(client, state, prompts_config, council_prompt)
 
         # D. Update and save state
-        turn_cost = state['total_session_cost'] - sum(t.get('total_cost', 0) for t in state['session_log'])
+        previous_total = state['session_log'][-1]['total_cost'] if state['session_log'] else 0
+        turn_cost = state['total_session_cost'] - previous_total
         ui.display_turn_telemetry(turn_cost, state['total_session_cost'], state['turn_counter'])
         state['session_log'].append({"turn": state['turn_counter'], "user_prompt": state['last_user_input'], "rapporteur_report": state['last_rapporteur_report'], "total_cost": state['total_session_cost']})
         state['turn_counter'] += 1
