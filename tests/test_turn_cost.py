@@ -25,3 +25,18 @@ def test_turn_cost_subsequent_turns():
     }
     assert compute_turn_cost(state) == pytest.approx(0.5)
 
+
+def test_turn_cost_multiple_turns():
+    state = {
+        'session_log': [],
+        'total_session_cost': 0.5
+    }
+    assert compute_turn_cost(state) == pytest.approx(0.5)
+
+    state['session_log'].append({'turn': 1, 'total_cost': state['total_session_cost']})
+    state['total_session_cost'] = 0.75
+    assert compute_turn_cost(state) == pytest.approx(0.25)
+
+    state['session_log'].append({'turn': 2, 'total_cost': state['total_session_cost']})
+    state['total_session_cost'] = 1.25
+    assert compute_turn_cost(state) == pytest.approx(0.5)
