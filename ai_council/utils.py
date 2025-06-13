@@ -1,16 +1,30 @@
 # ai_council/utils.py
-import os, tomllib, re, datetime, json
+import os, re, json, logging
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # pragma: no cover - built-in always present on 3.11+
+    import tomli as tomllib
 from openai import AsyncOpenAI
+
+logger = logging.getLogger("ai_council")
+if not logger.handlers:
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+logger.setLevel(logging.INFO)
 
 def load_config(file_path: str):
     try:
         with open(file_path, "rb") as f:
             return tomllib.load(f)
     except FileNotFoundError:
+        logger.error("Configuration file not found at %s", file_path, exc_info=True)
         raise FileNotFoundError(f"FATAL: Configuration file not found at {file_path}.")
 
 async def generate_filename_slug(prompt: str, client: AsyncOpenAI, council_models: dict, system_prompt: str) -> str:
-    print("... Generating filename slug from prompt ...")
+    logger.info("Generating filename slug from prompt")
     if not council_models: return "untitled_session"
     model_for_slug = list(council_models.values())[0]
 
@@ -25,7 +39,7 @@ async def generate_filename_slug(prompt: str, client: AsyncOpenAI, council_model
         slug = re.sub(r'[^a-z0-9_]', '', slug)
         return slug.strip('_')[:50] or "untitled_session"
     except Exception as e:
-        print(f"!! WARN: Could not generate AI slug: {e}. Falling back to default.")
+        logger.warning("Could not generate AI slug: %s. Falling back to default", e, exc_info=True)
         return "untitled_session"
 
 def write_audit_log(turn_number: int, data: dict):
@@ -34,5 +48,5 @@ def write_audit_log(turn_number: int, data: dict):
     os.makedirs(log_dir, exist_ok=True)
     filename = os.path.join(log_dir, f"turn_{turn_number:03d}_log.json")
     with open(filename, 'w', encoding='utf-8') as f:
-        json.dump(data, f, indent=2)
-    print(f"-> Audit log saved to {filename}")    
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    logger.info("Audit log saved to %s", filename)
